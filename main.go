@@ -1,6 +1,7 @@
 package main
 
 import (
+	"gofiber-gorm/src/config"
 	"gofiber-gorm/src/routes"
 	"log"
 
@@ -14,6 +15,8 @@ import (
 func main() {
 	app := fiber.New()
 
+	port := config.Env("APP_PORT")
+
 	// default middleware
 	app.Use(cors.New())
 	app.Use(compress.New())
@@ -23,9 +26,12 @@ func main() {
 	// static file
 	app.Static("/", "./public")
 
+	// Connect to the Database
+	config.ConnectDB()
+
 	// initial app route
 	routes.InitialRoutes(app)
 
 	// listening app
-	log.Fatal(app.Listen(":8000"))
+	log.Fatal(app.Listen(":" + port))
 }

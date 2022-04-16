@@ -2,5 +2,5 @@
 
 ## How to use
 ```sh
-./bin/sh air server --port 8000
+./bin/air server --port 8000
 ```

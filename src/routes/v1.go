@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"gofiber-gorm/src/controllers"
+	"gofiber-gorm/src/app/controllers"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"

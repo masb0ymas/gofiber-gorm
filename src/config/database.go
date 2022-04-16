@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"gofiber-gorm/src/models/entity"
+	"gofiber-gorm/src/app/entity"
 	"log"
 	"strconv"
 
@@ -47,4 +47,9 @@ func ConnectDB() {
 	dbName := cyan(DB_CONNECTION) + " : " + cyan(DB_DATABASE)
 
 	fmt.Println("Connection " + dbName + " has been established successfully.")
+}
+
+// Get Database
+func GetDB() *gorm.DB {
+	return DB
 }

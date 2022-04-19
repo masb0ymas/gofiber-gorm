@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/helmet/v2"
 )
 
 func main() {
@@ -20,6 +21,7 @@ func main() {
 	// default middleware
 	app.Use(cors.New())
 	app.Use(compress.New())
+	app.Use(helmet.New())
 	app.Use(logger.New())
 	app.Use(limiter.New(limiter.Config{Max: 100}))
 

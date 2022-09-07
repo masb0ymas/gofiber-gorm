@@ -1,6 +1,19 @@
 # Go Fiber - GORM
 
-## How to use
+## Run development
+
 ```sh
-./bin/air server --port 8000
+make dev
+```
+
+## Build code
+
+```sh
+make build
+```
+
+## Run production
+
+```sh
+make run
 ```

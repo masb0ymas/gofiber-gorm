@@ -3,13 +3,41 @@ package controllers
 import (
 	"gofiber-gorm/src/app/schema"
 	"gofiber-gorm/src/app/service"
-	"gofiber-gorm/src/config"
-	"gofiber-gorm/src/helpers"
-	"gofiber-gorm/src/modules/response"
+	"gofiber-gorm/src/pkg/config"
+	"gofiber-gorm/src/pkg/helpers"
+	"gofiber-gorm/src/pkg/modules/response"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 )
+
+// Get All
+func GetAll(c *fiber.Ctx) error {
+	db := config.GetDB()
+
+	var queryFiltered config.QueryFiltered
+
+	queryFiltered.Page = c.Query("page")
+	queryFiltered.PageSize = c.Query("pageSize")
+
+	roleService := service.NewRoleService(db)
+	data, total, err := roleService.GetAll(queryFiltered)
+
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"code":    http.StatusBadRequest,
+			"message": "error to get roles",
+		})
+	}
+
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"code":    http.StatusOK,
+		"message": "data has been received",
+		"data":    data,
+		"total":   total,
+	})
+
+}
 
 func CreateRole(c *fiber.Ctx) error {
 	db := config.GetDB()
@@ -24,7 +52,7 @@ func CreateRole(c *fiber.Ctx) error {
 	data, err := roleService.Create(*roleSchema)
 
 	if err != nil {
-		return c.Status(http.StatusOK).JSON(fiber.Map{
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"code":    http.StatusBadRequest,
 			"message": "failed to create role",
 		})

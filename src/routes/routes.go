@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"gofiber-gorm/src/helpers"
+	"gofiber-gorm/src/pkg/helpers"
 	"net/http"
 	"runtime"
 	"time"

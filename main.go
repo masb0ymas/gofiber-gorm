@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gofiber-gorm/src/config"
+	"gofiber-gorm/src/pkg/config"
 	"gofiber-gorm/src/routes"
 	"log"
 

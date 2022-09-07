@@ -9,10 +9,18 @@ import (
 	"github.com/fatih/color"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // Declare the variable for the database
 var DB *gorm.DB
+
+type QueryFiltered struct {
+	Page     string
+	PageSize string
+	Filtered []string
+	Order    []string
+}
 
 // ConnectDB connect to db
 func ConnectDB() {
@@ -34,14 +42,16 @@ func ConnectDB() {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", DB_HOST, port, DB_USERNAME, DB_PASSWORD, DB_DATABASE)
 
 	// Connect to the DB and initialize the DB variable
-	DB, err = gorm.Open(postgres.Open(dsn))
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 
 	if err != nil {
 		panic("failed to connect database")
 	}
 
 	// List Auto Migrate Table from struct model
-	DB.AutoMigrate(&entity.Role{})
+	DB.AutoMigrate(&entity.Role{}, &entity.User{})
 
 	cyan := color.New(color.FgCyan).SprintFunc()
 	dbName := cyan(DB_CONNECTION) + " : " + cyan(DB_DATABASE)

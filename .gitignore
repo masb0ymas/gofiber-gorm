@@ -1,4 +1,6 @@
 /tmp
 /build
+/docs
 
+.DS_Store
 .env

@@ -11,8 +11,13 @@ import (
 )
 
 type RoleRepository interface {
-	GetAll(queryFiltered config.QueryFiltered) ([]entity.Role, int64, error)
+	FindAll(queryFiltered config.QueryFiltered) ([]entity.Role, int64, error)
+	FindById(id uuid.UUID) (entity.Role, error)
 	Create(data schema.RoleSchema) (entity.Role, error)
+	Update(id uuid.UUID, data schema.RoleSchema) (entity.Role, error)
+	Restore(id uuid.UUID) error
+	SoftDelete(id uuid.UUID) error
+	ForceDelete(id uuid.UUID) error
 }
 
 type RoleService struct {
@@ -24,7 +29,7 @@ func NewRoleService(db *gorm.DB) RoleRepository {
 }
 
 // Get All
-func (service *RoleService) GetAll(queryFiltered config.QueryFiltered) ([]entity.Role, int64, error) {
+func (service *RoleService) FindAll(queryFiltered config.QueryFiltered) ([]entity.Role, int64, error) {
 	var data []entity.Role
 	var count int64
 
@@ -50,6 +55,19 @@ func (service *RoleService) GetAll(queryFiltered config.QueryFiltered) ([]entity
 	return data, count, nil
 }
 
+// Find By Id
+func (service *RoleService) FindById(id uuid.UUID) (entity.Role, error) {
+	var data entity.Role
+
+	err := service.db.Model(entity.Role{}).Where("id = ?", id).First(&data).Error
+
+	if err != nil {
+		return data, err
+	}
+
+	return data, nil
+}
+
 // create
 func (service *RoleService) Create(input schema.RoleSchema) (entity.Role, error) {
 	data := entity.Role{}
@@ -64,4 +82,55 @@ func (service *RoleService) Create(input schema.RoleSchema) (entity.Role, error)
 	}
 
 	return data, nil
+}
+
+// Update
+func (service *RoleService) Update(id uuid.UUID, input schema.RoleSchema) (entity.Role, error) {
+	data, err := service.FindById(id)
+	if err != nil {
+		return data, err
+	}
+
+	data.Name = input.Name
+
+	err = service.db.Save(&data).Error
+
+	if err != nil {
+		return data, err
+	}
+
+	return data, nil
+}
+
+// restore
+func (service *RoleService) Restore(id uuid.UUID) error {
+	err := service.db.Model(entity.Role{}).Unscoped().Where("id = ?", id).Update("deleted_at", nil).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// soft delete
+func (service *RoleService) SoftDelete(id uuid.UUID) error {
+	err := service.db.Delete(&entity.Role{}, id).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// force delete
+func (service *RoleService) ForceDelete(id uuid.UUID) error {
+	err := service.db.Unscoped().Delete(&entity.Role{}, id).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

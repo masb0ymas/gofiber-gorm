@@ -32,6 +32,9 @@ func InitialRoutes(app *fiber.App) {
 
 	app.Get("/monitor", monitor.New())
 
+	// initial swagger docs
+	SwaggerRoute(app)
+
 	// forbidden route version
 	app.Get("/v1", func(c *fiber.Ctx) error {
 		return c.Status(http.StatusForbidden).JSON(fiber.NewError(http.StatusForbidden))

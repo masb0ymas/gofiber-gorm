@@ -2,7 +2,10 @@ include .env
 
 BUILD_DIR = $(PWD)/build
 
-dev:
+swagger:
+	swag init -g main.go
+
+dev: swagger
 	./bin/air server --port $(APP_PORT)
 
 clean:

@@ -17,3 +17,9 @@ make build
 ```sh
 make run
 ```
+
+## Note :
+
+After create database run this SQL command :
+
+`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`

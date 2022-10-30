@@ -20,7 +20,8 @@ func (x *NullString) MarshalJSON() ([]byte, error) {
 	return json.Marshal(x.String)
 }
 
-func Pretty(data interface{}) {
+// Pretty JSON
+func PrettyJSON(data interface{}) {
 	b, err := json.MarshalIndent(data, "", " ")
 
 	if err != nil {

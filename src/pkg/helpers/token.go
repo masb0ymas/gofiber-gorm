@@ -95,7 +95,7 @@ func TokenValid(c *fiber.Ctx) error {
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		Pretty(claims)
+		PrettyJSON(claims)
 	}
 
 	return nil

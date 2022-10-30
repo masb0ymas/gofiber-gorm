@@ -24,6 +24,7 @@ type User struct {
 // GORM Hooks
 func (u *User) BeforeSave(tx *gorm.DB) error {
 	hashedPassword, err := helpers.HashPassword(u.Password)
+
 	if err != nil {
 		return err
 	}

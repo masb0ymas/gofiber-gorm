@@ -1,12 +1,16 @@
 package service
 
 import (
+	"encoding/json"
+	"fmt"
 	"gofiber-gorm/src/app/entity"
 	"gofiber-gorm/src/app/schema"
 	"gofiber-gorm/src/pkg/config"
+	"gofiber-gorm/src/pkg/helpers"
 	"strconv"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -18,6 +22,7 @@ type UserRepository interface {
 	Restore(id uuid.UUID) error
 	SoftDelete(id uuid.UUID) error
 	ForceDelete(id uuid.UUID) error
+	Login(data schema.LoginSchema) (string, error)
 }
 
 type UserService struct {
@@ -140,4 +145,32 @@ func (service *UserService) ForceDelete(id uuid.UUID) error {
 	}
 
 	return nil
+}
+
+// Login
+func (service *UserService) Login(input schema.LoginSchema) (string, error) {
+	var err error
+	var data entity.User
+
+	err = service.db.Model(entity.User{}).Where("email = ?", input.Email).First(&data).Error
+
+	if err != nil {
+		return "", err
+	}
+
+	err = helpers.ComparePassword(input.Password, data.Password)
+
+	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
+		return "", err
+	}
+
+	token, err := helpers.GenerateToken(data.ID)
+	json, _ := json.MarshalIndent(data, "", "\t")
+	fmt.Println(string(json), data.ID)
+
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }

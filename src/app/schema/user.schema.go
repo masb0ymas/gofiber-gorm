@@ -14,8 +14,7 @@ type UserSchema struct {
 	UploadId    null.String `json:"upload_id"`
 }
 
-type RegisterSchema struct {
-	Fullname string `json:"fullname" validate:"required"`
+type LoginSchema struct {
 	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }

@@ -79,7 +79,7 @@ func ExtractTokenID(c *fiber.Ctx) (uint, error) {
 	return 0, nil
 }
 
-func TokenValid(c *fiber.Ctx) error {
+func TokenValid(c *fiber.Ctx) (jwt.MapClaims, error) {
 	secretKey := os.Getenv("JWT_SECRET_ACCESS_TOKEN")
 	tokenString := ExtractToken(c)
 
@@ -91,12 +91,14 @@ func TokenValid(c *fiber.Ctx) error {
 	})
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		PrettyJSON(claims)
+
+		return claims, err
 	}
 
-	return nil
+	return nil, err
 }

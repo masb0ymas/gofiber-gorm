@@ -9,7 +9,7 @@ import (
 
 func AuthMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		err := helpers.TokenValid(c)
+		claims, err := helpers.TokenValid(c)
 
 		if err != nil {
 			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
@@ -17,6 +17,9 @@ func AuthMiddleware() fiber.Handler {
 				"message": "Unauthorized",
 			})
 		}
+
+		// return set local uid ( user login )
+		c.Locals("uid", claims["uid"].(string))
 
 		return c.Next()
 	}

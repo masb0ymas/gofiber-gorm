@@ -24,12 +24,12 @@ type QueryFiltered struct {
 
 // ConnectDB connect to db
 func ConnectDB() {
-	DB_CONNECTION := Env("DB_CONNECTION")
-	DB_HOST := Env("DB_HOST")
-	DB_PORT := Env("DB_PORT")
-	DB_DATABASE := Env("DB_DATABASE")
-	DB_USERNAME := Env("DB_USERNAME")
-	DB_PASSWORD := Env("DB_PASSWORD")
+	DB_CONNECTION := Env("DB_CONNECTION", "postgres")
+	DB_HOST := Env("DB_HOST", "127.0.0.1")
+	DB_PORT := Env("DB_PORT", "5432")
+	DB_DATABASE := Env("DB_DATABASE", "gofiber-gorm")
+	DB_USERNAME := Env("DB_USERNAME", "postgres")
+	DB_PASSWORD := Env("DB_PASSWORD", "postgres")
 
 	var err error
 	port, err := strconv.ParseUint(DB_PORT, 10, 32)

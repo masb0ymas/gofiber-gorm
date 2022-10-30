@@ -12,11 +12,11 @@ import (
 	"github.com/google/uuid"
 )
 
-var secretKey = os.Getenv("JWT_SECRET_ACCESS_TOKEN")
-var expiresToken = os.Getenv("JWT_ACCESS_TOKEN_EXPIRED") // example: 1 | 7 | 14 | 30 days
-
 // generate token
 func GenerateToken(user_id uuid.UUID) (string, error) {
+	secretKey := os.Getenv("JWT_SECRET_ACCESS_TOKEN")
+	expiresToken := os.Getenv("JWT_ACCESS_TOKEN_EXPIRED") // example: 1 | 7 | 14 | 30 days
+
 	expiresIn, err := strconv.Atoi(expiresToken) // expires in days
 
 	if err != nil {
@@ -52,6 +52,7 @@ func ExtractToken(c *fiber.Ctx) string {
 
 // extract token id
 func ExtractTokenID(c *fiber.Ctx) (uint, error) {
+	secretKey := os.Getenv("JWT_SECRET_ACCESS_TOKEN")
 	tokenString := ExtractToken(c)
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -79,6 +80,7 @@ func ExtractTokenID(c *fiber.Ctx) (uint, error) {
 }
 
 func TokenValid(c *fiber.Ctx) error {
+	secretKey := os.Getenv("JWT_SECRET_ACCESS_TOKEN")
 	tokenString := ExtractToken(c)
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {

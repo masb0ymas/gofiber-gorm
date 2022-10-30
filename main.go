@@ -16,7 +16,7 @@ import (
 func main() {
 	app := fiber.New()
 
-	port := config.Env("APP_PORT")
+	port := config.Env("APP_PORT", "8000")
 
 	// default middleware
 	app.Use(cors.New())

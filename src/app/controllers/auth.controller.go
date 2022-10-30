@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"gofiber-gorm/src/app/schema"
 	"gofiber-gorm/src/app/service"
 	"gofiber-gorm/src/pkg/config"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func Register(c *fiber.Ctx) error {
@@ -63,6 +65,30 @@ func Login(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(fiber.Map{
 		"code":    http.StatusOK,
 		"message": "login successfully",
+		"data":    data,
+	})
+}
+
+func VerifySession(c *fiber.Ctx) error {
+	db := config.GetDB()
+
+	uid := c.Locals("uid")
+	byteUID, _ := json.Marshal(uid)
+	newUID := uuid.Must(uuid.ParseBytes(byteUID))
+
+	userService := service.NewUserService(db)
+	data, err := userService.FindById(newUID)
+
+	if err != nil {
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{
+			"code":    http.StatusNotFound,
+			"message": "data not found or has been deleted",
+		})
+	}
+
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"code":    http.StatusOK,
+		"message": "data has been received",
 		"data":    data,
 	})
 }

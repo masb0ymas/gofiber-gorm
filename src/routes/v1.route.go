@@ -19,6 +19,7 @@ func RouteV1(app *fiber.App) {
 	authRoute := v1.Group("/auth")
 	authRoute.Post("/sign-up", controllers.Register)
 	authRoute.Post("/sign-in", controllers.Login)
+	authRoute.Get("/verify-session", middlewares.AuthMiddleware(), controllers.VerifySession)
 
 	// Role Route
 	roleRoute := v1.Group("/role", middlewares.AuthMiddleware())

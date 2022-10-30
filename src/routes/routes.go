@@ -27,6 +27,7 @@ func InitialRoutes(app *fiber.App) {
 			"date":       helpers.TimeIn("ID").Format(time.RFC850),
 			"go-version": runtime.Version(),
 			"status":     "Ok",
+			"cpu":        runtime.NumCPU(),
 		})
 	})
 

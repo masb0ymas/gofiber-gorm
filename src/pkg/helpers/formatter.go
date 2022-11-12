@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+
+	"github.com/google/uuid"
 )
 
 // NullString is a wrapper around sql.NullString
@@ -30,4 +32,12 @@ func PrettyJSON(data interface{}) {
 	}
 
 	fmt.Println(string(b))
+}
+
+// Parse UUID
+func ParseUUID(value any) uuid.UUID {
+	byteUID, _ := json.Marshal(value)
+	newUID := uuid.Must(uuid.ParseBytes(byteUID))
+
+	return newUID
 }

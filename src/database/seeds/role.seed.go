@@ -2,6 +2,7 @@ package seeds
 
 import (
 	"errors"
+	"fmt"
 	"gofiber-gorm/src/database/entity"
 	"gofiber-gorm/src/pkg/constants"
 	"log"
@@ -25,9 +26,15 @@ var roles = []entity.Role{
 
 func RoleSeed(db *gorm.DB) {
 	// role seeder
-	for _, value := range roles {
-		var newUUID = uuid.UUID{}
-		var data = entity.Role{}
+	for i, value := range roles {
+		var newUUID uuid.UUID
+
+		var data entity.Role
+		var seedData entity.Seeder
+		var newSeedData []entity.Seeder
+		var err error
+
+		index := i
 
 		if value.Name == "Super Admin" {
 			newUUID = uuid.MustParse(constants.ROLE_SUPER_ADMIN)
@@ -41,33 +48,49 @@ func RoleSeed(db *gorm.DB) {
 			newUUID = uuid.MustParse(constants.ROLE_USER)
 		}
 
-		// check ID
-		result := db.Model(entity.Role{}).Where("id = ?", newUUID).First(&data)
-		dataNotFound := errors.Is(result.Error, gorm.ErrRecordNotFound)
+		// get seeder
+		db.Model(entity.Seeder{}).Where("name ILIKE ?", "%role-seeder%").Find(&newSeedData)
 
-		// modif object data
-		data = entity.Role{
-			Base: entity.Base{
-				ID:        newUUID,
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
-			},
-			Name: value.Name,
+		// execute when data not found
+		if index < len(roles) {
+			result := db.Model(entity.Role{}).Where("id = ?", newUUID).First(&data)
+			roleNotFound := errors.Is(result.Error, gorm.ErrRecordNotFound)
+
+			// modif object data
+			data = entity.Role{
+				Base: entity.Base{
+					ID:        newUUID,
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				},
+				Name: value.Name,
+			}
+
+			if roleNotFound {
+				// create data
+				err = db.Model(&entity.Role{}).Create(&data).Error
+
+				// error create data
+				if err != nil {
+					log.Fatalf("cannot seed role table: %v", err)
+				}
+			}
 		}
 
-		if dataNotFound {
-			// create data
-			err := db.Model(&entity.Role{}).Create(&data).Error
+		// object seeder
+		newUnixTime := fmt.Sprintf("role-seeder-%v", time.Now().Unix())
+		seedData = entity.Seeder{
+			Base: entity.Base{
+				ID: uuid.New(),
+			},
+			Name: newUnixTime,
+		}
+
+		// create data when not found
+		if len(newSeedData) == 0 {
+			err = db.Model(&entity.Seeder{}).Create(&seedData).Error
 
 			// error create data
-			if err != nil {
-				log.Fatalf("cannot seed role table: %v", err)
-			}
-		} else {
-			// update data
-			err := db.Save(&data).Error
-
-			// error update data
 			if err != nil {
 				log.Fatalf("cannot seed role table: %v", err)
 			}

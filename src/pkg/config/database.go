@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"gofiber-gorm/src/app/entity"
+	"gofiber-gorm/src/database/entity"
 	"log"
 	"strconv"
 

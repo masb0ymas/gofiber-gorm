@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gofiber-gorm/src/app/schema"
 	"gofiber-gorm/src/app/service"
+	"gofiber-gorm/src/database/schema"
 	"gofiber-gorm/src/pkg/config"
 	"gofiber-gorm/src/pkg/helpers"
 	"gofiber-gorm/src/pkg/modules/response"

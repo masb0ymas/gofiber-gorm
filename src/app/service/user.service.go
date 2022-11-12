@@ -1,10 +1,8 @@
 package service
 
 import (
-	"encoding/json"
-	"fmt"
-	"gofiber-gorm/src/app/entity"
-	"gofiber-gorm/src/app/schema"
+	"gofiber-gorm/src/database/entity"
+	"gofiber-gorm/src/database/schema"
 	"gofiber-gorm/src/pkg/config"
 	"gofiber-gorm/src/pkg/helpers"
 	"strconv"
@@ -14,22 +12,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepository interface {
-	FindAll(queryFiltered config.QueryFiltered) ([]entity.User, int64, error)
-	FindById(id uuid.UUID) (entity.User, error)
-	Create(data schema.UserSchema) (entity.User, error)
-	Update(id uuid.UUID, data schema.UserSchema) (entity.User, error)
-	Restore(id uuid.UUID) error
-	SoftDelete(id uuid.UUID) error
-	ForceDelete(id uuid.UUID) error
-	Login(data schema.LoginSchema) (string, error)
-}
-
 type UserService struct {
 	db *gorm.DB
 }
 
-func NewUserService(db *gorm.DB) UserRepository {
+func NewUserService(db *gorm.DB) *UserService {
 	return &UserService{db}
 }
 
@@ -165,8 +152,6 @@ func (service *UserService) Login(input schema.LoginSchema) (string, error) {
 	}
 
 	token, err := helpers.GenerateToken(data.ID)
-	json, _ := json.MarshalIndent(data, "", "\t")
-	fmt.Println(string(json), data.ID)
 
 	if err != nil {
 		return "", err

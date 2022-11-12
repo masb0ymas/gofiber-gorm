@@ -1,8 +1,8 @@
 package service
 
 import (
-	"gofiber-gorm/src/app/entity"
-	"gofiber-gorm/src/app/schema"
+	"gofiber-gorm/src/database/entity"
+	"gofiber-gorm/src/database/schema"
 	"gofiber-gorm/src/pkg/config"
 	"strconv"
 
@@ -10,21 +10,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type RoleRepository interface {
-	FindAll(queryFiltered config.QueryFiltered) ([]entity.Role, int64, error)
-	FindById(id uuid.UUID) (entity.Role, error)
-	Create(data schema.RoleSchema) (entity.Role, error)
-	Update(id uuid.UUID, data schema.RoleSchema) (entity.Role, error)
-	Restore(id uuid.UUID) error
-	SoftDelete(id uuid.UUID) error
-	ForceDelete(id uuid.UUID) error
-}
-
 type RoleService struct {
 	db *gorm.DB
 }
 
-func NewRoleService(db *gorm.DB) RoleRepository {
+func NewRoleService(db *gorm.DB) *RoleService {
 	return &RoleService{db}
 }
 

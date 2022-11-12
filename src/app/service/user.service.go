@@ -52,7 +52,7 @@ func (service *UserService) FindAll(queryFiltered config.QueryFiltered) ([]entit
 func (service *UserService) FindById(id uuid.UUID) (entity.UserResponse, error) {
 	var data entity.UserResponse
 
-	err := service.db.Model(entity.User{}).Where("id = ?", id).First(&data).Error
+	err := service.db.Model(entity.User{}).Where("id = ?", id).Preload("Role").First(&data).Error
 
 	if err != nil {
 		return data, err

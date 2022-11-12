@@ -5,6 +5,7 @@ import (
 )
 
 func InitialSeed(db *gorm.DB) {
-	// run role seed
+	// list seeder
 	RoleSeed(db)
+	UserSeed(db)
 }

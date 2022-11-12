@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"gofiber-gorm/src/database/entity"
+	"gofiber-gorm/src/database/seeds"
 	"log"
 	"strconv"
 
@@ -52,6 +53,9 @@ func ConnectDB() {
 
 	// List Auto Migrate Table from struct model
 	DB.AutoMigrate(&entity.Role{}, &entity.User{})
+
+	// initial seed
+	seeds.InitialSeed(DB)
 
 	cyan := color.New(color.FgCyan).SprintFunc()
 	dbName := cyan(DB_CONNECTION) + " : " + cyan(DB_DATABASE)

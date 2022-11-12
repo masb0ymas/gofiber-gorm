@@ -2,7 +2,9 @@ package entity
 
 import (
 	"gofiber-gorm/src/pkg/helpers"
+	"time"
 
+	"github.com/google/uuid"
 	"gopkg.in/guregu/null.v4"
 	"gorm.io/gorm"
 )
@@ -19,6 +21,21 @@ type User struct {
 	RoleId      string      `json:"role_id" gorm:"type:uuid; not null" validate:"required"`
 	Role        Role        `json:"Role"`
 	UploadId    null.String `json:"upload_id" gorm:"type:uuid"`
+}
+
+type UserResponse struct {
+	ID        uuid.UUID      `json:"id"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at"`
+	Fullname  string         `json:"fullname"`
+	Email     *string        `json:"email"`
+	Phone     null.String    `json:"phone"`
+	IsActive  bool           `json:"is_active"`
+	IsBlocked bool           `json:"is_blocked"`
+	RoleId    string         `json:"role_id"`
+	Role      Role           `json:"Role"`
+	UploadId  null.String    `json:"upload_id"`
 }
 
 // GORM Hooks

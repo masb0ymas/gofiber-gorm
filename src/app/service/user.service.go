@@ -21,8 +21,8 @@ func NewUserService(db *gorm.DB) *UserService {
 }
 
 // Get All
-func (service *UserService) FindAll(queryFiltered config.QueryFiltered) ([]entity.User, int64, error) {
-	var data []entity.User
+func (service *UserService) FindAll(queryFiltered config.QueryFiltered) ([]entity.UserResponse, int64, error) {
+	var data []entity.UserResponse
 	var count int64
 
 	queryPage, _ := strconv.Atoi(queryFiltered.Page)
@@ -49,8 +49,8 @@ func (service *UserService) FindAll(queryFiltered config.QueryFiltered) ([]entit
 }
 
 // Find By Id
-func (service *UserService) FindById(id uuid.UUID) (entity.User, error) {
-	var data entity.User
+func (service *UserService) FindById(id uuid.UUID) (entity.UserResponse, error) {
+	var data entity.UserResponse
 
 	err := service.db.Model(entity.User{}).Where("id = ?", id).First(&data).Error
 
@@ -84,7 +84,7 @@ func (service *UserService) Create(input schema.UserSchema) (entity.User, error)
 }
 
 // Update
-func (service *UserService) Update(id uuid.UUID, input schema.UserSchema) (entity.User, error) {
+func (service *UserService) Update(id uuid.UUID, input schema.UserSchema) (entity.UserResponse, error) {
 	data, err := service.FindById(id)
 	if err != nil {
 		return data, err

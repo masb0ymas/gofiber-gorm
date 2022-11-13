@@ -144,27 +144,27 @@ func (service *UserService) ForceDelete(id uuid.UUID) error {
 }
 
 // Login
-func (service *UserService) Login(input schema.LoginSchema) (string, error) {
+func (service *UserService) Login(input schema.LoginSchema) (string, entity.User, error) {
 	var err error
 	var data entity.User
 
 	err = service.db.Model(entity.User{}).Where("email = ?", input.Email).First(&data).Error
 
 	if err != nil {
-		return "", err
+		return "", entity.User{}, err
 	}
 
 	err = helpers.ComparePassword(input.Password, data.Password)
 
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return "", err
+		return "", entity.User{}, err
 	}
 
 	token, err := helpers.GenerateToken(data.ID)
 
 	if err != nil {
-		return "", err
+		return "", entity.User{}, err
 	}
 
-	return token, nil
+	return token, data, nil
 }

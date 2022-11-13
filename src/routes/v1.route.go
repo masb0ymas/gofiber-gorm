@@ -31,6 +31,16 @@ func RouteV1(app *fiber.App) {
 	roleRoute.Delete("/soft-delete/:id", controllers.SoftDeleteRoleById)
 	roleRoute.Delete("/force-delete/:id", controllers.ForceDeleteRoleById)
 
+	// Session Route
+	sessionRoute := v1.Group("/session", middlewares.AuthMiddleware())
+	sessionRoute.Get("/", controllers.FindAllSession)
+	sessionRoute.Get("/:id", controllers.FindSessionById)
+	sessionRoute.Post("/", controllers.CreateSession)
+	sessionRoute.Put("/:id", controllers.UpdateSession)
+	sessionRoute.Put("/restore/:id", controllers.RestoreSessionById)
+	sessionRoute.Delete("/soft-delete/:id", controllers.SoftDeleteSessionById)
+	sessionRoute.Delete("/force-delete/:id", controllers.ForceDeleteSessionById)
+
 	// User Route
 	userRoute := v1.Group("/user", middlewares.AuthMiddleware())
 	userRoute.Get("/", controllers.FindAllUser)

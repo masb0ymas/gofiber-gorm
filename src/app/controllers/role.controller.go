@@ -16,13 +16,8 @@ import (
 func FindAllRole(c *fiber.Ctx) error {
 	db := config.GetDB()
 
-	var queryFiltered config.QueryFiltered
-
-	queryFiltered.Page = c.Query("page")
-	queryFiltered.PageSize = c.Query("pageSize")
-
 	roleService := service.NewRoleService(db)
-	data, total, err := roleService.FindAll(queryFiltered)
+	data, total, err := roleService.FindAll(c)
 
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{

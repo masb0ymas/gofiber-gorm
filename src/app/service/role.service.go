@@ -3,9 +3,9 @@ package service
 import (
 	"gofiber-gorm/src/database/entity"
 	"gofiber-gorm/src/database/schema"
-	"gofiber-gorm/src/pkg/config"
 	"strconv"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -19,24 +19,34 @@ func NewRoleService(db *gorm.DB) *RoleService {
 }
 
 // Get All
-func (service *RoleService) FindAll(queryFiltered config.QueryFiltered) ([]entity.Role, int64, error) {
+func (service *RoleService) FindAll(c *fiber.Ctx) ([]entity.Role, int64, error) {
 	var data []entity.Role
 	var count int64
 
-	queryPage, _ := strconv.Atoi(queryFiltered.Page)
-	queryPageSize, _ := strconv.Atoi(queryFiltered.PageSize)
+	var queryPage string
+	var queryPageSize string
 
-	page := queryPage | 1
-	pageSize := queryPageSize | 10
+	queryPage = c.Query("page")
+	queryPageSize = c.Query("pageSize")
+
+	if queryPage == "" {
+		queryPage = "1"
+	}
+
+	if queryPageSize == "" {
+		queryPageSize = "10"
+	}
+
+	page, _ := strconv.Atoi(queryPage)
+	pageSize, _ := strconv.Atoi(queryPageSize)
 
 	err := service.db.Model(entity.Role{}).
+		// Where("name ILIKE ?", "%admin%").
 		Offset((page - 1) * pageSize).
 		Limit(pageSize).
 		Order("created_at DESC").
-		Find(&data).Error
-
-	// total
-	service.db.Model(entity.Role{}).Count(&count)
+		Find(&data).
+		Count(&count).Error
 
 	if err != nil {
 		return data, count, err

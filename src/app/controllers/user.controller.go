@@ -16,13 +16,8 @@ import (
 func FindAllUser(c *fiber.Ctx) error {
 	db := config.GetDB()
 
-	var queryFiltered config.QueryFiltered
-
-	queryFiltered.Page = c.Query("page")
-	queryFiltered.PageSize = c.Query("pageSize")
-
 	userService := service.NewUserService(db)
-	data, total, err := userService.FindAll(queryFiltered)
+	data, total, err := userService.FindAll(c)
 
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{

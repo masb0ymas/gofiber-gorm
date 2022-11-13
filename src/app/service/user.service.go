@@ -3,10 +3,10 @@ package service
 import (
 	"gofiber-gorm/src/database/entity"
 	"gofiber-gorm/src/database/schema"
-	"gofiber-gorm/src/pkg/config"
 	"gofiber-gorm/src/pkg/helpers"
 	"strconv"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -21,25 +21,34 @@ func NewUserService(db *gorm.DB) *UserService {
 }
 
 // Get All
-func (service *UserService) FindAll(queryFiltered config.QueryFiltered) ([]entity.UserResponse, int64, error) {
+func (service *UserService) FindAll(c *fiber.Ctx) ([]entity.UserResponse, int64, error) {
 	var data []entity.UserResponse
 	var count int64
 
-	queryPage, _ := strconv.Atoi(queryFiltered.Page)
-	queryPageSize, _ := strconv.Atoi(queryFiltered.PageSize)
+	var queryPage string
+	var queryPageSize string
 
-	page := queryPage | 1
-	pageSize := queryPageSize | 10
+	queryPage = c.Query("page")
+	queryPageSize = c.Query("pageSize")
+
+	if queryPage == "" {
+		queryPage = "1"
+	}
+
+	if queryPageSize == "" {
+		queryPageSize = "10"
+	}
+
+	page, _ := strconv.Atoi(queryPage)
+	pageSize, _ := strconv.Atoi(queryPageSize)
 
 	err := service.db.Model(&entity.User{}).
 		Offset((page - 1) * pageSize).
 		Limit(pageSize).
 		Order("created_at DESC").
 		Preload("Role").
-		Find(&data).Error
-
-	// total
-	service.db.Model(entity.User{}).Count(&count)
+		Find(&data).
+		Count(&count).Error
 
 	if err != nil {
 		return data, count, err

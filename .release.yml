@@ -1,0 +1,28 @@
+commitFormat: conventional
+
+branch:
+  main: release
+
+release: "github"
+
+github:
+  repo: "gofiber-gorm"
+  user: "masb0ymas"
+
+assets:
+  - name: ./build/gofiber-gorm.linux_x86_64
+    compress: false
+  - name: ./build/gofiber-gorm.darwin_x86_64
+    compress: false
+  - name: ./build/gofiber-gorm.windows_x86_64.exe
+    compress: false
+
+hooks:
+  preRelease:
+    - name: echo $RELEASE_VERSION
+  postRelease:
+    - name: echo $RELEASE_VERSION
+
+integrations:
+  npm:
+    enabled: false

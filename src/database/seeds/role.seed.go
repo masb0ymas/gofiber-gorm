@@ -2,7 +2,6 @@ package seeds
 
 import (
 	"errors"
-	"fmt"
 	"gofiber-gorm/src/database/entity"
 	"gofiber-gorm/src/pkg/constants"
 	"log"
@@ -30,8 +29,6 @@ func RoleSeed(db *gorm.DB) {
 		var newUUID uuid.UUID
 
 		var data entity.Role
-		var seedData entity.Seeder
-		var newSeedData []entity.Seeder
 		var err error
 
 		index := i
@@ -47,9 +44,6 @@ func RoleSeed(db *gorm.DB) {
 		if value.Name == "User" {
 			newUUID = uuid.MustParse(constants.ROLE_USER)
 		}
-
-		// get seeder
-		db.Model(entity.Seeder{}).Where("name ILIKE ?", "%role-seeder%").Find(&newSeedData)
 
 		// execute when data not found
 		if index < len(roles) {
@@ -74,25 +68,6 @@ func RoleSeed(db *gorm.DB) {
 				if err != nil {
 					log.Fatalf("cannot seed role table: %v", err)
 				}
-			}
-		}
-
-		// object seeder
-		newUnixTime := fmt.Sprintf("role-seeder-%v", time.Now().Unix())
-		seedData = entity.Seeder{
-			Base: entity.Base{
-				ID: uuid.New(),
-			},
-			Name: newUnixTime,
-		}
-
-		// create data when not found
-		if len(newSeedData) == 0 {
-			err = db.Model(&entity.Seeder{}).Create(&seedData).Error
-
-			// error create data
-			if err != nil {
-				log.Fatalf("cannot seed role table: %v", err)
 			}
 		}
 	}

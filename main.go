@@ -19,7 +19,7 @@ func main() {
 	port := config.Env("APP_PORT", "8000")
 
 	// default middleware
-	app.Use(cors.New())
+	app.Use(cors.New(config.Cors()))
 	app.Use(compress.New())
 	app.Use(helmet.New())
 	app.Use(logger.New())

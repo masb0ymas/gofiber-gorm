@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"gofiber-gorm/src/app/service"
+	"gofiber-gorm/src/database/entity"
 	"gofiber-gorm/src/database/schema"
 	"gofiber-gorm/src/pkg/config"
 	"gofiber-gorm/src/pkg/helpers"
@@ -38,6 +39,9 @@ func Register(c *fiber.Ctx) error {
 }
 
 func Login(c *fiber.Ctx) error {
+	var sessionData entity.Session
+	var data entity.User
+
 	db := config.GetDB()
 	loginSchema := new(schema.LoginSchema)
 
@@ -46,7 +50,7 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	userService := service.NewUserService(db)
-	token, err := userService.Login(*loginSchema)
+	token, data, err := userService.Login(*loginSchema)
 
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
@@ -55,15 +59,34 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	data := fiber.Map{
+	userAgent := c.Get("User-Agent")
+
+	sessionData = entity.Session{
+		Token:     token,
+		IpAddress: c.IP(),
+		UserId:    data.ID.String(),
+		UserAgent: userAgent,
+	}
+
+	// create session
+	err = db.Model(&entity.Session{}).Create(&sessionData).Error
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"code":    http.StatusBadRequest,
+			"message": "failed to create session",
+		})
+	}
+
+	resData := fiber.Map{
 		"access_token": token,
 		"token_type":   "Bearer",
+		"uid":          data.ID,
 	}
 
 	return c.Status(http.StatusOK).JSON(fiber.Map{
 		"code":    http.StatusOK,
 		"message": "login successfully",
-		"data":    data,
+		"data":    resData,
 	})
 }
 

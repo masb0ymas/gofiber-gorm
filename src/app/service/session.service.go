@@ -74,8 +74,7 @@ func (service *SessionService) Create(input schema.SessionSchema) (entity.Sessio
 	data.ID = uuid.New()
 	data.Token = input.Token
 	data.IpAddress = input.IpAddress
-	data.Device = input.Device
-	data.Platform = input.Platform
+	data.UserAgent = input.UserAgent
 	data.UserId = input.UserId
 
 	err := service.db.Create(&data).Error
@@ -96,8 +95,7 @@ func (service *SessionService) Update(id uuid.UUID, input schema.SessionSchema) 
 
 	data.Token = input.Token
 	data.IpAddress = input.IpAddress
-	data.Device = input.Device
-	data.Platform = input.Platform
+	data.UserAgent = input.UserAgent
 	data.UserId = input.UserId
 
 	err = service.db.Save(&data).Error

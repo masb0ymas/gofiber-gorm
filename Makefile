@@ -19,3 +19,6 @@ run: build
 
 swag:
 	swag init
+
+update-deps:
+	go get -u && go mod tidy

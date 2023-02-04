@@ -23,11 +23,12 @@ func InitialRoutes(app *fiber.App) {
 
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.Status(http.StatusOK).JSON(fiber.Map{
-			"code":       http.StatusOK,
-			"date":       helpers.TimeIn("ID").Format(time.RFC850),
-			"go-version": runtime.Version(),
-			"status":     "Ok",
-			"cpu":        runtime.NumCPU(),
+			"code":    http.StatusOK,
+			"cpu":     runtime.NumCPU(),
+			"date":    helpers.TimeIn("ID").Format(time.RFC850),
+			"golang":  runtime.Version(),
+			"gofiber": fiber.Version,
+			"status":  "Ok",
 		})
 	})
 

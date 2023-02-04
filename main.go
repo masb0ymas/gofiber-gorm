@@ -10,9 +10,25 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/helmet/v2"
+
+	_ "gofiber-gorm/docs"
 )
 
+// @title 											API Documentation
+// @version 										1.0
+// @description 								This is an auto-generated API Docs.
+// @termsOfService 							http://swagger.io/terms/
+// @contact.name 								API Support
+// @contact.email 							n.fajri@mail.com
+// @license.name 								Apache 2.0
+// @license.url 								http://www.apache.org/licenses/LICENSE-2.0.html
+// @securityDefinitions.apikey 	ApiKeyAuth
+// @in 													header
+// @name 												Authorization
+// @BasePath 										/
 func main() {
 	app := fiber.New()
 
@@ -24,6 +40,8 @@ func main() {
 	app.Use(helmet.New())
 	app.Use(logger.New())
 	app.Use(limiter.New(limiter.Config{Max: 100}))
+	app.Use(requestid.New())
+	app.Use(recover.New())
 
 	// static file
 	app.Static("/", "./public")

@@ -12,7 +12,14 @@ import (
 	"github.com/google/uuid"
 )
 
-// Find All Role
+// GetRoles 		func gets all exists roles.
+// @Description Get all exists roles.
+// @Summary 		get all exists roles
+// @Tags 				Role
+// @Accept 			json
+// @Produce 		json
+// @Success 		200 {string} status "Ok"
+// @Router 			/v1/role [get]
 func FindAllRole(c *fiber.Ctx) error {
 	db := config.GetDB()
 
@@ -34,7 +41,15 @@ func FindAllRole(c *fiber.Ctx) error {
 	})
 }
 
-// Find Role By Id
+// GetRole 			func gets role by given ID or 404 error.
+// @Description Get role by given ID.
+// @Summary 		get role by given ID
+// @Tags 				Role
+// @Accept 			json
+// @Produce 		json
+// @Param 			id path string true "Role ID"
+// @Success 		200 {string} status "Ok"
+// @Router 			/v1/role/{id} [get]
 func FindRoleById(c *fiber.Ctx) error {
 	db := config.GetDB()
 	id, err := uuid.Parse(c.Params("id"))
@@ -63,7 +78,16 @@ func FindRoleById(c *fiber.Ctx) error {
 	})
 }
 
-// Create Role
+// CreateRole 	func for creates a new role.
+// @Description Create a new role.
+// @Summary 		create a new role
+// @Tags 				Role
+// @Accept 			x-www-form-urlencoded
+// @Produce 		json
+// @Param 			name formData string true "Name"
+// @Success 		200 {string} status "Ok"
+// @Security 		ApiKeyAuth
+// @Router 			/v1/role [post]
 func CreateRole(c *fiber.Ctx) error {
 	db := config.GetDB()
 	roleSchema := new(schema.RoleSchema)
@@ -90,7 +114,17 @@ func CreateRole(c *fiber.Ctx) error {
 	})
 }
 
-// Update Role
+// UpdateRole 	func for updates role by given ID.
+// @Description Update role.
+// @Summary 		update role
+// @Tags 				Role
+// @Accept 			x-www-form-urlencoded
+// @Produce 		json
+// @Param 			id path string true "Role ID"
+// @Param 			name formData string true "Name"
+// @Success 		200 {string} status "Ok"
+// @Security 		ApiKeyAuth
+// @Router 			/v1/role/{id} [put]
 func UpdateRole(c *fiber.Ctx) error {
 	db := config.GetDB()
 	roleSchema := new(schema.RoleSchema)
@@ -126,7 +160,16 @@ func UpdateRole(c *fiber.Ctx) error {
 	})
 }
 
-// Restore
+// RestoreRole 	func for Restores role by given ID.
+// @Description Restore role by given ID.
+// @Summary 		Restore role by given ID
+// @Tags 				Role
+// @Accept 			json
+// @Produce 		json
+// @Param 			id path string true "Role ID"
+// @Success 		200 {string} status "Ok"
+// @Security 		ApiKeyAuth
+// @Router 			/v1/role/restore/{id} [put]
 func RestoreRoleById(c *fiber.Ctx) error {
 	db := config.GetDB()
 	id, err := uuid.Parse(c.Params("id"))
@@ -154,7 +197,16 @@ func RestoreRoleById(c *fiber.Ctx) error {
 	})
 }
 
-// Soft Delete
+// SoftDeleteRole 	func for Soft Deletes role by given ID.
+// @Description 		Soft Delete role by given ID.
+// @Summary 				Soft Delete role by given ID
+// @Tags 						Role
+// @Accept 					json
+// @Produce 				json
+// @Param 					id path string true "Role ID"
+// @Success 				200 {string} status "Ok"
+// @Security 				ApiKeyAuth
+// @Router 					/v1/role/soft-delete/{id} [delete]
 func SoftDeleteRoleById(c *fiber.Ctx) error {
 	db := config.GetDB()
 	id, err := uuid.Parse(c.Params("id"))
@@ -182,7 +234,16 @@ func SoftDeleteRoleById(c *fiber.Ctx) error {
 	})
 }
 
-// Force Delete
+// ForceDeleteRole 	func for Force Deletes role by given ID.
+// @Description 		Force Delete role by given ID.
+// @Summary 				Force Delete role by given ID
+// @Tags 						Role
+// @Accept 					json
+// @Produce 				json
+// @Param 					id path string true "Role ID"
+// @Success 				200 {string} status "Ok"
+// @Security 				ApiKeyAuth
+// @Router 					/v1/role/force-delete/{id} [delete]
 func ForceDeleteRoleById(c *fiber.Ctx) error {
 	db := config.GetDB()
 	id, err := uuid.Parse(c.Params("id"))

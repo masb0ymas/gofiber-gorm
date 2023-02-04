@@ -16,3 +16,6 @@ build: clean
 
 run: build
 	$(BUILD_DIR)/$(APP_NAME)
+
+swag:
+	swag init

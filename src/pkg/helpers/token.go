@@ -35,16 +35,25 @@ func GenerateToken(user_id uuid.UUID) (string, error) {
 
 // extract token
 func ExtractToken(c *fiber.Ctx) string {
-	token := c.Query("token")
+	// get token by query
+	getTokenByQuery := c.Query("token")
 
-	if token != "" {
-		return token
+	// get token by cookies
+	getTokenByCookie := c.Cookies("token")
+
+	// get token by request header
+	getTokenByReqHeader := c.Get("Authorization")
+
+	if getTokenByQuery != "" {
+		return getTokenByQuery
 	}
 
-	bearerToken := c.Get("Authorization")
+	if getTokenByCookie != "" {
+		return getTokenByCookie
+	}
 
-	if len(strings.Split(bearerToken, " ")) == 2 {
-		return strings.Split(bearerToken, " ")[1]
+	if len(strings.Split(getTokenByReqHeader, " ")) == 2 {
+		return strings.Split(getTokenByReqHeader, " ")[1]
 	}
 
 	return ""

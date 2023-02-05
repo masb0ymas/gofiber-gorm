@@ -19,6 +19,7 @@ import (
 // @Accept 			json
 // @Produce 		json
 // @Success 		200 {string} status "Ok"
+// @Security 		ApiKeyAuth
 // @Router 			/v1/role [get]
 func FindAllRole(c *fiber.Ctx) error {
 	db := config.GetDB()
@@ -49,6 +50,7 @@ func FindAllRole(c *fiber.Ctx) error {
 // @Produce 		json
 // @Param 			id path string true "Role ID"
 // @Success 		200 {string} status "Ok"
+// @Security 		ApiKeyAuth
 // @Router 			/v1/role/{id} [get]
 func FindRoleById(c *fiber.Ctx) error {
 	db := config.GetDB()

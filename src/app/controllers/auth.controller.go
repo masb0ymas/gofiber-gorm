@@ -8,10 +8,21 @@ import (
 	"gofiber-gorm/src/pkg/helpers"
 	"gofiber-gorm/src/pkg/modules/response"
 	"net/http"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
 
+// Register 		func for register account.
+// @Description Create a new account.
+// @Summary 		create a new account
+// @Tags 				Auth
+// @Accept 			x-www-form-urlencoded
+// @Produce 		json
+// @Param 			email formData string true "Email"
+// @Param 			password formData string true "Password"
+// @Success 		200 {string} status "Ok"
+// @Router 			/v1/auth/sign-up [post]
 func Register(c *fiber.Ctx) error {
 	db := config.GetDB()
 	userSchema := new(schema.UserSchema)
@@ -38,6 +49,16 @@ func Register(c *fiber.Ctx) error {
 	})
 }
 
+// Login 				func for login account.
+// @Description Login account.
+// @Summary 		Login account
+// @Tags 				Auth
+// @Accept 			x-www-form-urlencoded
+// @Produce 		json
+// @Param 			email formData string true "Email"
+// @Param 			password formData string true "Password"
+// @Success 		200 {string} status "Ok"
+// @Router 			/v1/auth/sign-in [post]
 func Login(c *fiber.Ctx) error {
 	var sessionData entity.Session
 	var data entity.User
@@ -83,6 +104,15 @@ func Login(c *fiber.Ctx) error {
 		"uid":          data.ID,
 	}
 
+	// set login by cookie
+	c.Cookie(&fiber.Cookie{
+		Name:     "token",
+		Value:    token,
+		Expires:  time.Now().Add(24 * time.Hour),
+		HTTPOnly: true,
+		SameSite: "lax",
+	})
+
 	return c.Status(http.StatusOK).JSON(fiber.Map{
 		"code":    http.StatusOK,
 		"message": "login successfully",
@@ -90,6 +120,15 @@ func Login(c *fiber.Ctx) error {
 	})
 }
 
+// VerifySession	func for verify session login account.
+// @Description 	Verify Session Login account.
+// @Summary 			Verify Session Login account
+// @Tags 					Auth
+// @Accept 				json
+// @Produce 			json
+// @Success 			200 {string} status "Ok"
+// @Security 			ApiKeyAuth
+// @Router 				/v1/auth/verify-session [get]
 func VerifySession(c *fiber.Ctx) error {
 	db := config.GetDB()
 

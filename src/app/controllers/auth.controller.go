@@ -5,12 +5,16 @@ import (
 	"gofiber-gorm/src/database/entity"
 	"gofiber-gorm/src/database/schema"
 	"gofiber-gorm/src/pkg/config"
+	"gofiber-gorm/src/pkg/constants"
 	"gofiber-gorm/src/pkg/helpers"
 	"gofiber-gorm/src/pkg/modules/response"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 // Register 		func for register account.
@@ -19,13 +23,20 @@ import (
 // @Tags 				Auth
 // @Accept 			x-www-form-urlencoded
 // @Produce 		json
+// @Param 			fullname formData string true "Fullname"
 // @Param 			email formData string true "Email"
 // @Param 			password formData string true "Password"
+// @Param 			phone formData string false "Phone"
 // @Success 		200 {string} status "Ok"
 // @Router 			/v1/auth/sign-up [post]
 func Register(c *fiber.Ctx) error {
 	db := config.GetDB()
-	userSchema := new(schema.UserSchema)
+	userSchema := new(schema.RegisterSchema)
+
+	token, _ := helpers.GenerateToken(uuid.New())
+
+	userSchema.RoleId = constants.ROLE_USER
+	userSchema.TokenVerify = token
 
 	if err := helpers.ParseFormDataAndValidate(c, userSchema); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(response.HttpErrorResponse(err))
@@ -33,12 +44,12 @@ func Register(c *fiber.Ctx) error {
 
 	// user service
 	userService := service.NewUserService(db)
-	data, err := userService.Create(*userSchema)
+	data, err := userService.Register(*userSchema)
 
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"code":    http.StatusBadRequest,
-			"message": "failed to create user",
+			"message": err.Error(),
 		})
 	}
 
@@ -76,7 +87,7 @@ func Login(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"code":    http.StatusBadRequest,
-			"message": "invalid email or password",
+			"message": err.Error(),
 		})
 	}
 
@@ -104,11 +115,15 @@ func Login(c *fiber.Ctx) error {
 		"uid":          data.ID,
 	}
 
+	expiresToken := os.Getenv("JWT_ACCESS_TOKEN_EXPIRED")
+	expiresIn, _ := strconv.Atoi(expiresToken) // expires in days
+	expiresCookie := time.Now().Add(time.Hour * 24 * time.Duration(expiresIn))
+
 	// set login by cookie
 	c.Cookie(&fiber.Cookie{
 		Name:     "token",
 		Value:    token,
-		Expires:  time.Now().Add(24 * time.Hour),
+		Expires:  expiresCookie,
 		HTTPOnly: true,
 		SameSite: "lax",
 	})

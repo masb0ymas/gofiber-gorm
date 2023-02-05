@@ -1,14 +1,16 @@
 package service
 
 import (
+	"errors"
 	"gofiber-gorm/src/database/entity"
 	"gofiber-gorm/src/database/schema"
 	"gofiber-gorm/src/pkg/helpers"
+	"log"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/guregu/null.v4"
 	"gorm.io/gorm"
 )
 
@@ -81,6 +83,7 @@ func (service *UserService) Create(input schema.UserSchema) (entity.User, error)
 	data.Phone = input.Phone
 	data.TokenVerify = input.TokenVerify
 	data.IsActive = input.IsActive
+	data.IsBlocked = input.IsBlocked
 	data.RoleId = input.RoleId
 
 	err := service.db.Create(&data).Error
@@ -143,27 +146,54 @@ func (service *UserService) ForceDelete(id uuid.UUID) error {
 	return nil
 }
 
+// create
+func (service *UserService) Register(input schema.RegisterSchema) (entity.User, error) {
+	data := entity.User{}
+
+	data.ID = uuid.New()
+	data.Fullname = input.Fullname
+	data.Email = input.Email
+	data.Password = input.Password
+	data.Phone = input.Phone
+	data.TokenVerify = null.NewString(input.TokenVerify, true)
+	data.RoleId = input.RoleId
+
+	err := service.db.Create(&data).Error
+
+	if err != nil {
+		return data, errors.New("failed to registered account")
+	}
+
+	return data, nil
+}
+
 // Login
 func (service *UserService) Login(input schema.LoginSchema) (string, entity.User, error) {
 	var err error
 	var data entity.User
 
-	err = service.db.Model(entity.User{}).Where("email = ?", input.Email).First(&data).Error
+	err = service.db.Model(entity.User{}).
+		Where("email = ?", input.Email).
+		Where("is_active = ?", true).
+		Where("is_blocked = ?", false).
+		First(&data).Error
 
 	if err != nil {
-		return "", entity.User{}, err
+		return "", entity.User{}, errors.New("account not found or not registered")
 	}
 
-	err = helpers.ComparePassword(input.Password, data.Password)
+	log.Println(data.Password, input.Password)
 
-	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return "", entity.User{}, err
+	matchPassword := helpers.ComparePassword(data.Password, input.Password)
+
+	if !matchPassword {
+		return "", entity.User{}, errors.New("incorrect email or password")
 	}
 
 	token, err := helpers.GenerateToken(data.ID)
 
 	if err != nil {
-		return "", entity.User{}, err
+		return "", entity.User{}, errors.New("failed to generate access token")
 	}
 
 	return token, data, nil

@@ -52,7 +52,7 @@ func ConnectDB() {
 	}
 
 	// List Auto Migrate Table from struct model
-	DB.AutoMigrate(&entity.Role{}, &entity.User{}, &entity.Session{})
+	DB.AutoMigrate(&entity.Role{}, &entity.User{}, &entity.Session{}, &entity.Upload{})
 
 	// initial seed
 	seeds.InitialSeed(DB)

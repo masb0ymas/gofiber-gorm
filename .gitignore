@@ -1,6 +1,7 @@
 /tmp
 /build
 /docs
+/public/tmp
 
 .DS_Store
 .env

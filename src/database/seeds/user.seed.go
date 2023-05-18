@@ -13,13 +13,19 @@ import (
 
 var users = []entity.User{
 	{
-		Fullname: "Super Admin",
+		Fullname:  "Super Admin",
+		IsActive:  true,
+		IsBlocked: false,
 	},
 	{
-		Fullname: "Admin",
+		Fullname:  "Admin",
+		IsActive:  true,
+		IsBlocked: false,
 	},
 	{
-		Fullname: "User",
+		Fullname:  "User",
+		IsActive:  true,
+		IsBlocked: false,
 	},
 }
 
@@ -27,34 +33,32 @@ func UserSeed(db *gorm.DB) {
 	defaultPassword := "Padang123"
 
 	// user seeder
-	for i, value := range users {
+	for k, v := range users {
 		var newRoleUUID uuid.UUID
 		var newEmail string
 
 		var data entity.User
 		var err error
 
-		index := i
-
-		if value.Fullname == "Super Admin" {
+		if v.Fullname == "Super Admin" {
 			newRoleUUID = uuid.MustParse(constants.ROLE_SUPER_ADMIN)
 			newEmail = "super.admin@mail.com"
 		}
 
-		if value.Fullname == "Admin" {
+		if v.Fullname == "Admin" {
 			newRoleUUID = uuid.MustParse(constants.ROLE_ADMIN)
 			newEmail = "admin@mail.com"
 		}
 
-		if value.Fullname == "User" {
+		if v.Fullname == "User" {
 			newRoleUUID = uuid.MustParse(constants.ROLE_USER)
 			newEmail = "user@mail.com"
 		}
 
 		// execute when data not found
-		if index < len(users) {
+		if k < len(users) {
 			result := db.Model(entity.User{}).Where("email = ?", newEmail).First(&data)
-			userNotFound := errors.Is(result.Error, gorm.ErrRecordNotFound)
+			recordNotFound := errors.Is(result.Error, gorm.ErrRecordNotFound)
 
 			// modif object data
 			data = entity.User{
@@ -63,15 +67,15 @@ func UserSeed(db *gorm.DB) {
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				},
-				Fullname:  value.Fullname,
+				Fullname:  v.Fullname,
 				Email:     &newEmail,
 				Password:  defaultPassword,
-				IsActive:  true,
-				IsBlocked: false,
+				IsActive:  v.IsActive,
+				IsBlocked: v.IsBlocked,
 				RoleId:    newRoleUUID.String(),
 			}
 
-			if userNotFound {
+			if recordNotFound {
 				// create data
 				err = db.Model(&entity.User{}).Create(&data).Error
 

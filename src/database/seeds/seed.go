@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitialSeed(db *gorm.DB) {
+func Initialize(db *gorm.DB) {
 	// list seeder
 	RoleSeed(db)
 	UserSeed(db)

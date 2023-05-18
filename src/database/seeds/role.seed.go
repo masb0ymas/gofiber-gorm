@@ -25,30 +25,28 @@ var roles = []entity.Role{
 
 func RoleSeed(db *gorm.DB) {
 	// role seeder
-	for i, value := range roles {
+	for k, v := range roles {
 		var newUUID uuid.UUID
 
 		var data entity.Role
 		var err error
 
-		index := i
-
-		if value.Name == "Super Admin" {
+		if v.Name == "Super Admin" {
 			newUUID = uuid.MustParse(constants.ROLE_SUPER_ADMIN)
 		}
 
-		if value.Name == "Admin" {
+		if v.Name == "Admin" {
 			newUUID = uuid.MustParse(constants.ROLE_ADMIN)
 		}
 
-		if value.Name == "User" {
+		if v.Name == "User" {
 			newUUID = uuid.MustParse(constants.ROLE_USER)
 		}
 
 		// execute when data not found
-		if index < len(roles) {
+		if k < len(roles) {
 			result := db.Model(entity.Role{}).Where("id = ?", newUUID).First(&data)
-			roleNotFound := errors.Is(result.Error, gorm.ErrRecordNotFound)
+			recordNotFound := errors.Is(result.Error, gorm.ErrRecordNotFound)
 
 			// modif object data
 			data = entity.Role{
@@ -57,10 +55,10 @@ func RoleSeed(db *gorm.DB) {
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				},
-				Name: value.Name,
+				Name: v.Name,
 			}
 
-			if roleNotFound {
+			if recordNotFound {
 				// create data
 				err = db.Model(&entity.Role{}).Create(&data).Error
 

@@ -10,7 +10,9 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 )
 
-func InitialRoutes(app *fiber.App) {
+// Initial routes
+func Initialize(app *fiber.App) {
+
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Status(http.StatusOK).JSON(fiber.Map{
 			"code":      http.StatusOK,
@@ -46,9 +48,6 @@ func InitialRoutes(app *fiber.App) {
 	RouteV1(app)
 
 	app.Get("*", func(c *fiber.Ctx) error {
-		return c.Status(http.StatusNotFound).JSON(fiber.Map{
-			"code":    http.StatusNotFound,
-			"message": "Sorry, HTTP resource you are looking for was not found.",
-		})
+		return c.Status(http.StatusNotFound).JSON(fiber.NewError(http.StatusNotFound, "Sorry, HTTP resource you are looking for was not found."))
 	})
 }

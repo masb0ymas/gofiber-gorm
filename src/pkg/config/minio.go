@@ -2,6 +2,8 @@ package config
 
 import (
 	"context"
+	"fmt"
+	"gofiber-gorm/src/pkg/helpers"
 	"log"
 
 	"github.com/minio/minio-go/v7"
@@ -40,12 +42,14 @@ func MinIOConnection() (*minio.Client, error) {
 		exists, err := minioClient.BucketExists(ctx, MINIO_BUCKET_NAME)
 
 		if err == nil && exists {
-			log.Printf("We already own %s\n", MINIO_BUCKET_NAME)
+			logMessage := fmt.Sprintf("We already own %s\n", MINIO_BUCKET_NAME)
+			fmt.Println(helpers.PrintLog("Minio", logMessage))
 		} else {
 			log.Fatalln(err.Error())
 		}
 	} else {
-		log.Printf("Successfully created %s\n", MINIO_BUCKET_NAME)
+		logMessage := fmt.Sprintf("Successfully created %s\n", MINIO_BUCKET_NAME)
+		fmt.Println(helpers.PrintLog("Minio", logMessage))
 	}
 
 	return minioClient, err

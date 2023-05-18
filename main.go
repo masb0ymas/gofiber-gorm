@@ -4,6 +4,7 @@ import (
 	"gofiber-gorm/src/pkg/config"
 	"gofiber-gorm/src/routes"
 	"log"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -33,13 +34,15 @@ func main() {
 	app := fiber.New()
 
 	port := config.Env("APP_PORT", "8000")
+	envRateLimit := config.Env("RATE_LIMIT", "10")
+	rateLimit, _ := strconv.Atoi(envRateLimit)
 
 	// default middleware
 	app.Use(cors.New(config.Cors()))
 	app.Use(compress.New())
 	app.Use(helmet.New())
 	app.Use(logger.New())
-	app.Use(limiter.New(limiter.Config{Max: 100}))
+	app.Use(limiter.New(limiter.Config{Max: rateLimit}))
 	app.Use(requestid.New())
 	app.Use(recover.New())
 
@@ -50,7 +53,7 @@ func main() {
 	config.ConnectDB()
 
 	// initial app route
-	routes.InitialRoutes(app)
+	routes.Initialize(app)
 
 	// listening app
 	log.Fatal(app.Listen(":" + port))

@@ -7,7 +7,6 @@ import (
 	"gofiber-gorm/src/pkg/config"
 	"gofiber-gorm/src/pkg/constants"
 	"gofiber-gorm/src/pkg/helpers"
-	"gofiber-gorm/src/pkg/modules/response"
 	"net/http"
 	"os"
 	"strconv"
@@ -39,7 +38,7 @@ func Register(c *fiber.Ctx) error {
 	userSchema.TokenVerify = token
 
 	if err := helpers.ParseFormDataAndValidate(c, userSchema); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(response.HttpErrorResponse(err))
+		return c.Status(http.StatusBadRequest).JSON(fiber.NewError(http.StatusBadRequest))
 	}
 
 	// user service
@@ -78,7 +77,7 @@ func Login(c *fiber.Ctx) error {
 	loginSchema := new(schema.LoginSchema)
 
 	if err := helpers.ParseFormDataAndValidate(c, loginSchema); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(response.HttpErrorResponse(err))
+		return c.Status(http.StatusBadRequest).JSON(fiber.NewError(http.StatusBadRequest))
 	}
 
 	userService := service.NewUserService(db)

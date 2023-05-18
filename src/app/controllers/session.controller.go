@@ -5,7 +5,6 @@ import (
 	"gofiber-gorm/src/database/schema"
 	"gofiber-gorm/src/pkg/config"
 	"gofiber-gorm/src/pkg/helpers"
-	"gofiber-gorm/src/pkg/modules/response"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -37,6 +36,7 @@ func FindAllSession(c *fiber.Ctx) error {
 // Find Session By Id
 func FindSessionById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {
@@ -66,10 +66,11 @@ func FindSessionById(c *fiber.Ctx) error {
 // Create Session
 func CreateSession(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	sessionSchema := new(schema.SessionSchema)
 
 	if err := helpers.ParseFormDataAndValidate(c, sessionSchema); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(response.HttpErrorResponse(err))
+		return c.Status(http.StatusBadRequest).JSON(fiber.NewError(http.StatusBadRequest))
 	}
 
 	// session service
@@ -93,6 +94,7 @@ func CreateSession(c *fiber.Ctx) error {
 // Update Session
 func UpdateSession(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	sessionSchema := new(schema.SessionSchema)
 
 	id, err := uuid.Parse(c.Params("id"))
@@ -105,7 +107,7 @@ func UpdateSession(c *fiber.Ctx) error {
 	}
 
 	if err := helpers.ParseFormDataAndValidate(c, sessionSchema); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(response.HttpErrorResponse(err))
+		return c.Status(http.StatusBadRequest).JSON(fiber.NewError(http.StatusBadRequest))
 	}
 
 	// session service
@@ -129,6 +131,7 @@ func UpdateSession(c *fiber.Ctx) error {
 // Restore
 func RestoreSessionById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {
@@ -157,6 +160,7 @@ func RestoreSessionById(c *fiber.Ctx) error {
 // Soft Delete
 func SoftDeleteSessionById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {
@@ -185,6 +189,7 @@ func SoftDeleteSessionById(c *fiber.Ctx) error {
 // Force Delete
 func ForceDeleteSessionById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {

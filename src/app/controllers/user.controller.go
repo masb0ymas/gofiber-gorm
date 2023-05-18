@@ -5,7 +5,6 @@ import (
 	"gofiber-gorm/src/database/schema"
 	"gofiber-gorm/src/pkg/config"
 	"gofiber-gorm/src/pkg/helpers"
-	"gofiber-gorm/src/pkg/modules/response"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -37,6 +36,7 @@ func FindAllUser(c *fiber.Ctx) error {
 // Find User By Id
 func FindUserById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {
@@ -66,10 +66,11 @@ func FindUserById(c *fiber.Ctx) error {
 // Create User
 func CreateUser(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	userSchema := new(schema.UserSchema)
 
 	if err := helpers.ParseFormDataAndValidate(c, userSchema); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(response.HttpErrorResponse(err))
+		return c.Status(http.StatusBadRequest).JSON(fiber.NewError(http.StatusBadRequest))
 	}
 
 	// user service
@@ -93,6 +94,7 @@ func CreateUser(c *fiber.Ctx) error {
 // Update User
 func UpdateUser(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	userSchema := new(schema.UserSchema)
 
 	id, err := uuid.Parse(c.Params("id"))
@@ -105,7 +107,7 @@ func UpdateUser(c *fiber.Ctx) error {
 	}
 
 	if err := helpers.ParseFormDataAndValidate(c, userSchema); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(response.HttpErrorResponse(err))
+		return c.Status(http.StatusBadRequest).JSON(fiber.NewError(http.StatusBadRequest))
 	}
 
 	// user service
@@ -129,6 +131,7 @@ func UpdateUser(c *fiber.Ctx) error {
 // Restore
 func RestoreUserById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {
@@ -157,6 +160,7 @@ func RestoreUserById(c *fiber.Ctx) error {
 // Soft Delete
 func SoftDeleteUserById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {
@@ -185,6 +189,7 @@ func SoftDeleteUserById(c *fiber.Ctx) error {
 // Force Delete
 func ForceDeleteUserById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {

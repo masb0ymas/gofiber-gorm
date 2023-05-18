@@ -7,7 +7,6 @@ import (
 	"gofiber-gorm/src/database/schema"
 	"gofiber-gorm/src/pkg/config"
 	"gofiber-gorm/src/pkg/helpers"
-	"gofiber-gorm/src/pkg/modules/response"
 	"log"
 	"net/http"
 	"net/url"
@@ -62,6 +61,7 @@ func FindAllUpload(c *fiber.Ctx) error {
 // @Router 			/v1/upload/{id} [get]
 func FindUploadById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {
@@ -140,7 +140,6 @@ func PresignedUploadURL(c *fiber.Ctx) error {
 // @Security 		ApiKeyAuth
 // @Router 			/v1/upload [post]
 func CreateUpload(c *fiber.Ctx) error {
-	// db := config.GetDB()
 	ctx := context.Background()
 	// uploadSchema := new(schema.UploadSchema)
 
@@ -222,6 +221,7 @@ func CreateUpload(c *fiber.Ctx) error {
 // @Router 			/v1/upload/{id} [put]
 func UpdateUpload(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	uploadSchema := new(schema.UploadSchema)
 
 	id, err := uuid.Parse(c.Params("id"))
@@ -234,7 +234,7 @@ func UpdateUpload(c *fiber.Ctx) error {
 	}
 
 	if err := helpers.ParseFormDataAndValidate(c, uploadSchema); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(response.HttpErrorResponse(err))
+		return c.Status(http.StatusBadRequest).JSON(fiber.NewError(http.StatusBadRequest))
 	}
 
 	// role service
@@ -267,6 +267,7 @@ func UpdateUpload(c *fiber.Ctx) error {
 // @Router 				/v1/upload/restore/{id} [put]
 func RestoreUploadById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {
@@ -304,6 +305,7 @@ func RestoreUploadById(c *fiber.Ctx) error {
 // @Router 						/v1/upload/soft-delete/{id} [delete]
 func SoftDeleteUploadById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {
@@ -341,6 +343,7 @@ func SoftDeleteUploadById(c *fiber.Ctx) error {
 // @Router 						/v1/upload/force-delete/{id} [delete]
 func ForceDeleteUploadById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {

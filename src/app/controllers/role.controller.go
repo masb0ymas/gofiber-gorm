@@ -5,7 +5,6 @@ import (
 	"gofiber-gorm/src/database/schema"
 	"gofiber-gorm/src/pkg/config"
 	"gofiber-gorm/src/pkg/helpers"
-	"gofiber-gorm/src/pkg/modules/response"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -54,6 +53,7 @@ func FindAllRole(c *fiber.Ctx) error {
 // @Router 			/v1/role/{id} [get]
 func FindRoleById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {
@@ -92,10 +92,11 @@ func FindRoleById(c *fiber.Ctx) error {
 // @Router 			/v1/role [post]
 func CreateRole(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	roleSchema := new(schema.RoleSchema)
 
 	if err := helpers.ParseFormDataAndValidate(c, roleSchema); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(response.HttpErrorResponse(err))
+		return c.Status(http.StatusBadRequest).JSON(fiber.NewError(http.StatusBadRequest))
 	}
 
 	// role service
@@ -129,6 +130,7 @@ func CreateRole(c *fiber.Ctx) error {
 // @Router 			/v1/role/{id} [put]
 func UpdateRole(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	roleSchema := new(schema.RoleSchema)
 
 	id, err := uuid.Parse(c.Params("id"))
@@ -141,7 +143,7 @@ func UpdateRole(c *fiber.Ctx) error {
 	}
 
 	if err := helpers.ParseFormDataAndValidate(c, roleSchema); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(response.HttpErrorResponse(err))
+		return c.Status(http.StatusBadRequest).JSON(fiber.NewError(http.StatusBadRequest))
 	}
 
 	// role service
@@ -174,6 +176,7 @@ func UpdateRole(c *fiber.Ctx) error {
 // @Router 			/v1/role/restore/{id} [put]
 func RestoreRoleById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {
@@ -211,6 +214,7 @@ func RestoreRoleById(c *fiber.Ctx) error {
 // @Router 					/v1/role/soft-delete/{id} [delete]
 func SoftDeleteRoleById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {
@@ -248,6 +252,7 @@ func SoftDeleteRoleById(c *fiber.Ctx) error {
 // @Router 					/v1/role/force-delete/{id} [delete]
 func ForceDeleteRoleById(c *fiber.Ctx) error {
 	db := config.GetDB()
+
 	id, err := uuid.Parse(c.Params("id"))
 
 	if err != nil {

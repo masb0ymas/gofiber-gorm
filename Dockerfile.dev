@@ -1,4 +1,10 @@
-FROM golang:1.19-alpine as build_base
+ARG APP_NAME=my-app
+
+FROM golang:1.20-alpine as base
+LABEL author="masb0ymas"
+LABEL name="expresso"
+
+FROM base as build_base
 
 RUN apk add --no-cache git
 
@@ -16,7 +22,7 @@ COPY . .
 RUN cp .env.docker-staging .env
 
 # Build the Go app
-RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o ./dist/gofiber-app main.go
+RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o ./dist/${APP_NAME} main.go
 
 # Start fresh from a smaller image
 FROM alpine:3.16 as runner
@@ -32,7 +38,7 @@ ENV TZ=Asia/Jakarta
 # editor cli with nano
 RUN apk add nano
 
-COPY --from=build_base /temp-build/dist/gofiber-app ./gofiber-app
+COPY --from=build_base /temp-build/dist/${APP_NAME} ./${APP_NAME}
 COPY --from=build_base /temp-build/bin ./bin
 COPY --from=build_base /temp-build/public ./public
 COPY --from=build_base /temp-build/.air.toml ./.air.toml
@@ -42,4 +48,4 @@ COPY --from=build_base /temp-build/.env ./.env
 EXPOSE 8000
 
 # Run the binary program produced by `go install`
-CMD ["./gofiber-app"]
+CMD ["./${APP_NAME}"]

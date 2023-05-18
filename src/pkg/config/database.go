@@ -2,9 +2,9 @@ package config
 
 import (
 	"fmt"
-	"gofiber-gorm/src/database/entity"
+	"gofiber-gorm/src/database/migrations"
 	"gofiber-gorm/src/database/seeds"
-	"log"
+	"gofiber-gorm/src/pkg/helpers"
 	"strconv"
 
 	"github.com/fatih/color"
@@ -15,13 +15,6 @@ import (
 
 // Declare the variable for the database
 var DB *gorm.DB
-
-type QueryFiltered struct {
-	Page     string
-	PageSize string
-	Filtered []string
-	Order    []string
-}
 
 // ConnectDB connect to db
 func ConnectDB() {
@@ -36,7 +29,8 @@ func ConnectDB() {
 	port, err := strconv.ParseUint(DB_PORT, 10, 32)
 
 	if err != nil {
-		log.Println("Error database port")
+		fmt.Println(err)
+		panic("invalid database port")
 	}
 
 	// Connection URL to connect to Postgres Database
@@ -48,19 +42,20 @@ func ConnectDB() {
 	})
 
 	if err != nil {
+		fmt.Println(err)
 		panic("failed to connect database")
 	}
 
-	// List Auto Migrate Table from struct model
-	DB.AutoMigrate(&entity.Role{}, &entity.User{}, &entity.Session{}, &entity.Upload{})
-
 	// initial seed
-	seeds.InitialSeed(DB)
+	seeds.Initialize(DB)
+	migrations.Initialize(DB)
 
 	cyan := color.New(color.FgCyan).SprintFunc()
 	dbName := cyan(DB_CONNECTION) + " : " + cyan(DB_DATABASE)
+	msg := fmt.Sprintf("Connection %s has been established successfully.", dbName)
 
-	fmt.Println("Connection " + dbName + " has been established successfully.")
+	logMessage := helpers.PrintLog("GORM", msg)
+	fmt.Println(logMessage)
 }
 
 // Get Database

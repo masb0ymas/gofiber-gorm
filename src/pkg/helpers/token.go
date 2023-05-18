@@ -12,7 +12,9 @@ import (
 	"github.com/google/uuid"
 )
 
-// generate token
+/*
+Generate Token
+*/
 func GenerateToken(user_id uuid.UUID) (string, error) {
 	secretKey := os.Getenv("JWT_SECRET_ACCESS_TOKEN")
 	expiresToken := os.Getenv("JWT_ACCESS_TOKEN_EXPIRED") // example: 1 | 7 | 14 | 30 days
@@ -33,7 +35,9 @@ func GenerateToken(user_id uuid.UUID) (string, error) {
 	return token.SignedString([]byte(secretKey))
 }
 
-// extract token
+/*
+Extract Token
+*/
 func ExtractToken(c *fiber.Ctx) string {
 	// get token by query
 	getTokenByQuery := c.Query("token")
@@ -45,21 +49,32 @@ func ExtractToken(c *fiber.Ctx) string {
 	getTokenByReqHeader := c.Get("Authorization")
 
 	if getTokenByQuery != "" {
+		logMessage := PrintLog("Auth", "Extract from Query")
+		fmt.Println(logMessage, getTokenByQuery)
+
 		return getTokenByQuery
 	}
 
 	if getTokenByCookie != "" {
+		logMessage := PrintLog("Auth", "Extract from Cookie")
+		fmt.Println(logMessage, getTokenByCookie)
+
 		return getTokenByCookie
 	}
 
 	if len(strings.Split(getTokenByReqHeader, " ")) == 2 {
+		logMessage := PrintLog("Auth", "Extract from Header")
+		fmt.Println(logMessage, getTokenByReqHeader)
+
 		return strings.Split(getTokenByReqHeader, " ")[1]
 	}
 
 	return ""
 }
 
-// extract token id
+/*
+Extract Token ID
+*/
 func ExtractTokenID(c *fiber.Ctx) (uint, error) {
 	secretKey := os.Getenv("JWT_SECRET_ACCESS_TOKEN")
 	tokenString := ExtractToken(c)
@@ -88,6 +103,9 @@ func ExtractTokenID(c *fiber.Ctx) (uint, error) {
 	return 0, nil
 }
 
+/*
+Token Valid
+*/
 func TokenValid(c *fiber.Ctx) (jwt.MapClaims, error) {
 	secretKey := os.Getenv("JWT_SECRET_ACCESS_TOKEN")
 	tokenString := ExtractToken(c)

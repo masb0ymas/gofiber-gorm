@@ -16,23 +16,30 @@ import (
 Generate Token
 */
 func GenerateToken(user_id uuid.UUID) (string, error) {
-	secretKey := os.Getenv("JWT_SECRET_ACCESS_TOKEN")
-	expiresToken := os.Getenv("JWT_ACCESS_TOKEN_EXPIRED") // example: 1 | 7 | 14 | 30 days
+	var APP_NAME = os.Getenv("APP_NAME")
+	var expiresToken = os.Getenv("JWT_ACCESS_TOKEN_EXPIRED")
+	var secretKey = os.Getenv("JWT_SECRET_ACCESS_TOKEN")
+
+	var JWT_SIGNATURE_KEY = []byte(secretKey)
+	var JWT_SIGNING_METHOD = jwt.SigningMethodHS256
 
 	expiresIn, err := strconv.Atoi(expiresToken) // expires in days
+
+	var JWT_EXPIRES_TOKEN = time.Now().Add(time.Hour * 24 * time.Duration(expiresIn)).Unix()
 
 	if err != nil {
 		return "", nil
 	}
 
-	claims := jwt.MapClaims{}
-	claims["authorized"] = true
-	claims["uid"] = user_id
-	claims["exp"] = time.Now().Add(time.Hour * 24 * time.Duration(expiresIn)).Unix() // Token expires after 7 Days
+	claims := jwt.MapClaims{
+		"iss": APP_NAME,
+		"exp": JWT_EXPIRES_TOKEN,
+		"uid": user_id,
+	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jwt.NewWithClaims(JWT_SIGNING_METHOD, claims)
 
-	return token.SignedString([]byte(secretKey))
+	return token.SignedString(JWT_SIGNATURE_KEY)
 }
 
 /*
@@ -73,48 +80,24 @@ func ExtractToken(c *fiber.Ctx) string {
 }
 
 /*
-Extract Token ID
-*/
-func ExtractTokenID(c *fiber.Ctx) (uint, error) {
-	secretKey := os.Getenv("JWT_SECRET_ACCESS_TOKEN")
-	tokenString := ExtractToken(c)
-
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-		}
-		return []byte(secretKey), nil
-	})
-
-	if err != nil {
-		return 0, err
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-
-	if ok && token.Valid {
-		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["uid"]), 10, 32)
-		if err != nil {
-			return 0, err
-		}
-		return uint(uid), nil
-	}
-
-	return 0, nil
-}
-
-/*
 Token Valid
 */
-func TokenValid(c *fiber.Ctx) (jwt.MapClaims, error) {
-	secretKey := os.Getenv("JWT_SECRET_ACCESS_TOKEN")
+func VerifyToken(c *fiber.Ctx) (jwt.MapClaims, error) {
+	var secretKey = os.Getenv("JWT_SECRET_ACCESS_TOKEN")
+
+	var JWT_SIGNATURE_KEY = []byte(secretKey)
+	var JWT_SIGNING_METHOD = jwt.SigningMethodHS256
+
 	tokenString := ExtractToken(c)
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		if method, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Signing method invalid: %v", token.Header["alg"])
+		} else if method != JWT_SIGNING_METHOD {
+			return nil, fmt.Errorf("Signing method invalid")
 		}
-		return []byte(secretKey), nil
+
+		return JWT_SIGNATURE_KEY, nil
 	})
 
 	if err != nil {

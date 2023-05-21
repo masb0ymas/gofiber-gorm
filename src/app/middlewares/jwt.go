@@ -9,7 +9,7 @@ import (
 
 func AuthMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		claims, err := helpers.TokenValid(c)
+		claims, err := helpers.VerifyToken(c)
 
 		if err != nil {
 			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
